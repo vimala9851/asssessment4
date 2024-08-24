@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>To-Do List</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: #f7f7f7;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            margin: 0;
+            color: #333;
+            box-sizing: border-box;
+            overflow-x: hidden;
+        }
+
+        header {
+            background: #d32f2f;
+            color: black;
+            text-align: center;
+            padding: 30px; 
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 36px; 
+            float: left;
+        }
+
+        nav {
+            margin-top: 10px;
+            float:right;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            padding: 14px 24px; 
+            border-radius: 25px;
+            
+            margin: 0 10px;
+            background: black;
+            transition: background 0.3s ease, color 0.3s ease;
+            display: inline-block;
+            font-size: 18px; 
+        
+        }
+
+        nav a.active,
+        nav a:hover {
+            background: black;
+            color:white;
+            color:#d32f2f;
+            
+        }
+
+        .container {
+            background: white;
+            padding: 25px; 
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 600px;
+            margin: 20px auto;
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            position: relative;
+        }
+
+        .task-input-container,
+        .task-display-container {
+            margin-bottom: 20px;
+        }
+
+        .task-input-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+
+        #new-task {
+            flex-grow: 1;
+            padding: 14px; 
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            font-size: 18px; 
+            transition: border-color 0.3s ease;
+        }
+
+        #new-task:focus {
+            border-color: #d32f2f;
+            outline: none;
+        }
+
+        #add-task {
+            padding: 14px 24px; 
+            border: none;
+            background-color: #d32f2f;
+            color: white;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background 0.3s ease, transform 0.2s ease;
+            font-size: 18px; 
+        }
+
+        #add-task:hover {
+            background-color: #b71c1c;
+            transform: scale(1.05);
+        }
+
+        .task-display-container {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            opacity: 0;
+            animation: fadeIn 1s forwards;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 15px;
+            color: #d32f2f;
+            font-size: 28px; 
+        }
+
+        #task-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        li {
+            padding: 18px; 
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            background: #fff;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            transition: background 0.3s ease, transform 0.3s ease;
+            font-size: 18px; 
+        }
+
+        li.completed {
+            text-decoration: line-through;
+            color: #888;
+            background: #ffe4e4;
+        }
+
+        li div {
+            display: flex;
+            gap: 10px; 
+        }
+
+        li button {
+            background: none;
+            border: none;
+            padding: 10px 14px; 
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background 0.3s ease, transform 0.2s ease;
+            font-size: 16px; 
+        }
+
+        li button.edit {
+            color: rgb(7, 70, 95);
+        }
+
+        li button.delete {
+            color: #e53935;
+        }
+
+        li button.toggle {
+            color: #4caf50;
+        }
+
+        li button:hover {
+            background:smokewhite;
+            transform: scale(1.1);
+        }
+
+        li.added {
+            animation: slideIn 0.5s forwards;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(-100%);
+            }
+            to {
+                transform: translateX(0);
+            }
+        }
+
+        footer {
+            background: #d32f2f;
+            color: black;
+            text-align: center;
+            padding: 20px; 
+            box-shadow: 0 -4px 8px rgba(0, 0, 0, 0.1);
+            margin-top: auto;
+            position: relative;
+            font-size: 16px; 
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>To-Do List</h1>
+        <nav>
+            <a href="#" data-filter="all" class="active">All</a>
+            <a href="#" data-filter="pending">Pending</a>
+            <a href="#" data-filter="completed">Completed</a>
+        </nav>
+    </header>
+    <div class="container">
+        <div class="task-input-container">
+            <input type="text" id="new-task" placeholder="Add a new task...">
+            <button id="add-task">Add Task</button>
+        </div>
+        <div class="task-display-container">
+            <h2>To-Do List</h2>
+            <ul id="task-list"></ul>
+        </div>
+    </div>
+    <footer>
+        <p>&copy; 2024 Vimala Seggam. All Rights Reserved.</p>
+    </footer>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const taskInput = document.querySelector('#new-task');
+            const taskList = document.querySelector('#task-list');
+            const addTaskBtn = document.querySelector('#add-task');
+            const navLinks = document.querySelectorAll('nav a');
+
+            let tasks = [];
+
+            const renderTasks = (filter = 'all') => {
+                taskList.innerHTML = '';
+                const filteredTasks = tasks.filter(task => {
+                    if (filter === 'completed') return task.completed;
+                    if (filter === 'pending') return !task.completed;
+                    return true;
+                });
+
+                filteredTasks.forEach((task, index) => {
+                    const li = document.createElement('li');
+                    li.className = task.completed ? 'completed added' : 'added';
+                    li.innerHTML = `
+                        <span>${task.text}</span>
+                        <div>
+                            <button class="edit">Edit</button>
+                            <button class="delete">Delete</button>
+                            <button class="toggle">${task.completed ? 'Unmark' : 'Mark'}</button>
+                        </div>
+                    `;
+
+                    // Event Listeners
+                    li.querySelector('.edit').addEventListener('click', () => editTask(index));
+                    li.querySelector('.delete').addEventListener('click', () => deleteTask(index));
+                    li.querySelector('.toggle').addEventListener('click', () => toggleTaskCompletion(index));
+
+                    taskList.appendChild(li);
+                });
+            };
+
+            const addTask = () => {
+                const text = taskInput.value.trim();
+                if (text !== '') {
+                    tasks.push({ text, completed: false });
+                    taskInput.value = '';
+                    renderTasks();
+                }
+            };
+
+            const editTask = index => {
+                const newText = prompt('Edit your task:', tasks[index].text);
+                if (newText !== null) {
+                    tasks[index].text = newText.trim();
+                    renderTasks();
+                }
+            };
+
+            const deleteTask = index => {
+                tasks.splice(index, 1);
+                renderTasks();
+            };
+
+            const toggleTaskCompletion = index => {
+                tasks[index].completed = !tasks[index].completed;
+                renderTasks();
+            };
+
+            navLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    navLinks.forEach(btn => btn.classList.remove('active'));
+                    link.classList.add('active');
+                    renderTasks(link.getAttribute('data-filter'));
+                });
+            });
+
+            addTaskBtn.addEventListener('click', addTask);
+            taskInput.addEventListener('keypress', e => {
+                if (e.key === 'Enter') addTask();
+            });
+
+            renderTasks();
+        });
+    </script>
+</body>
+</html>
